@@ -1,0 +1,17 @@
+{
+  "name": "adventofcode2025",
+  "version": "0.0.1",
+  "description": "challenges of year",
+  "license": "ISC",
+  "author": "Husrev Akbas",
+  "type": "module",
+  "main": "day2.ts",
+  "scripts": {
+    "test": "node "
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "fs": "^0.0.1-security",
+    "typescript": "^5.9.3"
+  }
+}
