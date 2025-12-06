@@ -51,7 +51,7 @@ public class day5 {
 		int i = 0;
 		for (String range : ranges)
 		{
-			String[] edges = edges = range.split("-");
+			String[] edges = range.split("-");
 			// System.out.println(edges[0] + " " + edges[1]);
 			rangesLong[i] = Long.parseLong(edges[0]);
 			rangesLong[i + 1] = Long.parseLong(edges[1]);
