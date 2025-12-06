@@ -12,6 +12,7 @@
   "devDependencies": {
     "@types/node": "^24.10.1",
     "fs": "^0.0.1-security",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }
