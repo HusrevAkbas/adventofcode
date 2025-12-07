@@ -1,7 +1,6 @@
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class day6
 {
@@ -14,7 +13,6 @@ public class day6
 		}
 		String filename = args[0];
 
-        System.out.println("Works");
         try {
 
 			String input = Files.readString(Path.of(filename));
