@@ -29,4 +29,9 @@ class Pos3d
             Math.pow(this.z - other.z, 2)
         ));
     }
+
+    public boolean isEqual(Pos3d other)
+    {
+        return (this.x == other.x && this.y == other.y && this.z == other.z);
+    }
 }

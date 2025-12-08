@@ -2,87 +2,117 @@ package aoc.day08;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Iterator;
 
-class day8
-{
+class day8 {
     public static void main(String[] args)
     {
         if (args.length == 0)
-        {
-            System.err.println("Please provide the filename as first argument");
-            return ;
-        }
+		{
+			System.out.println("Provide filename as argument");
+			return ;
+		}
+
+		String filename = args[0];
         try {
-            String filename = args[0];
+
             String input = Files.readString(Path.of(filename));
-            Map<Pos3d, Integer> posMap = new HashMap<>();
-            // List<Pos3d> posList = new ArrayList<>();
-            
             String[] lines = input.split("\n");
 
-            // Convert lines to list of 3D positions
-            for (String line : lines)
+            Map<Pos3d, Integer> posList = new LinkedHashMap<Pos3d, Integer>();
+
+            for (String l : lines)
             {
-                String[] numbers = line.split(",");
-                if (numbers.length > 3)
-                    System.err.println("Error: Wrong count of numbers");
-                posMap.put(new Pos3d(
+                String[] numbers = l.split(",");
+                posList.put(new Pos3d(
                     Double.parseDouble(numbers[0]),
                     Double.parseDouble(numbers[1]),
                     Double.parseDouble(numbers[2])
-                    ), 0);
+                ), 0);
             }
+            
+            // init 3d positions
+            // 1 - find first pos that doesnt have a circuit
+            // 2 - find next connected positions until hit one of previous
+            // 3 - increase circuit number
+            // 1 - find next connected positions until hit one of previous
+            Pos3d   current = null;
+            Pos3d   next = null;
+            Pos3d   previous = null;
 
-            Pos3d next = getFirstKeyHasValueZero(posMap);
             int circuit = 1;
 
-            Pos3d[] keySet = new Pos3d[](0);
-            keySet = posMap.keySet().toArray();
-            
-            while (next != null)
+            while (posList.containsValue(0))
             {
-                Pos3d prev = null;
-                next.printValues();
-                posMap.put(next, circuit);
-                next = getFirstKeyHasValueZero(posMap);
-                prev = next;
+                // find first unassigned node and assign a circuit
+                if (next == null)
+                {
+                    next = findPosWithValueZero(posList);
+                    posList.put(next, circuit);
+                }
+                else
+                {
+                    current = next;
+                    next = findNextClosePos(posList, current, previous);
+                    next.printValues();
+                    previous = current;
+                    if (next == null || posList.get(next) > 0)
+                    {
+                        circuit++;
+                        next = null;
+                        previous = null;
+                        current = null;
+                        continue ;
+                    }
+                    posList.put(next, circuit);
+                }
             }
-            
+
+            posList.forEach((key, val) -> System.out.println(key + " : " + val));
 
         } catch (Exception e) {
-            System.out.println("Something went wrong, double check your code");
+            System.err.println("Something is wrong, check your code!");
         }
     }
 
-    // first of next circuit
-    public static Pos3d getFirstKeyHasValueZero(Map<Pos3d, Integer> map)
+    public static Pos3d findPosWithValueZero(Map<Pos3d, Integer> map)
     {
-        Pos3d next = null;
-        Pos3d[] keySet = new Pos3d[0];
-        keySet = map.keySet().toArray(keySet);
-        for (Pos3d p : keySet)
+        Set<Pos3d> keys = map.keySet();
+        Pos3d   pos = null;
+        
+        Iterator<Pos3d> it = keys.iterator();
+        while (it.hasNext())
         {
-            if (map.get(p) == 0)
-                return (p);
+            pos = it.next();
+            if (map.get(pos) == 0)
+                return (pos);
         }
-        return (next);
+        return null;
     }
 
-    public static Pos3d findNextClosestPoint(Pos3d[] keyArray, Pos3d current, Pos3d prev)
+    public static Pos3d findNextClosePos(Map<Pos3d, Integer> map, Pos3d current, Pos3d previous)
     {
-        // Work this
-        // Pos3d next = null;
-        // for (Pos3d p : keyArray)
-        // {
-        //     if (p != current && p != prev &&
-        //         current.distanceTo(p) )
-        //         next = p;
-        // }
-        // return (next);
+        if (current == null)
+            return null;
+
+        Set<Pos3d> keys = map.keySet();
+        Iterator<Pos3d> it = keys.iterator();
+        Pos3d pos = null;
+        Pos3d target = null;
+
+        while (it.hasNext())
+        {
+            pos = it.next();
+            if (pos.isEqual(current) || (previous != null && pos.isEqual(previous)))
+                continue ;
+            if (target == null)
+                target = pos;
+            else if (current.distanceTo(pos) < current.distanceTo(target))
+                target = pos;
+        }
+        return target;
     }
 }
