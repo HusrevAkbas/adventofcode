@@ -35,9 +35,9 @@ class day7 {
                         // System.out.print("i is " + i + " "+ beams.get(i) + " | ");
                         result += beams.get(i);
                         if (i > 0)
-                            beams.merge(i - 1, beams.get(i), (a, b) -> a + b);
+                            beams.merge(i - 1, beams.get(i), Long::sum);
                         if (i < line.length())
-                            beams.merge(i+1, beams.get(i), (a, b) -> a + b);
+                            beams.merge(i+1, beams.get(i), Long::sum);
                         beams.remove(i);
                     }
                     i = line.indexOf("^", i + 1);
