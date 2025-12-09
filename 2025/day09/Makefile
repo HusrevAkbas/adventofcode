@@ -1,6 +1,6 @@
 
-SRC_FILES	=	day8.java Pos3d.java
-RUNNER		=	aoc.day08.day8
+SRC_FILES	=	day9.java Pos2d.java
+RUNNER		=	aoc.y2025.day09.day9
 INPUT_FILE	=	input.txt
 EXAMPLE_FILE	=	example.txt
 

@@ -1,4 +1,4 @@
-package aoc.day08;
+package aoc.y2025.day08;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
