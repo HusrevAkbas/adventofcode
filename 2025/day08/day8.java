@@ -3,9 +3,13 @@ package aoc.day08;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 import java.util.Iterator;
+import java.util.Collections;
 
 class day8 {
     public static void main(String[] args)
@@ -22,97 +26,165 @@ class day8 {
             String input = Files.readString(Path.of(filename));
             String[] lines = input.split("\n");
 
-            Map<Pos3d, Integer> posList = new LinkedHashMap<Pos3d, Integer>();
+            List<Pos3d> posList = new ArrayList<>();
+            List<List<Pos3d>> circuitList = new ArrayList<>();
 
             for (String l : lines)
             {
                 String[] numbers = l.split(",");
-                posList.put(new Pos3d(
+                posList.add(new Pos3d(
                     Double.parseDouble(numbers[0]),
                     Double.parseDouble(numbers[1]),
                     Double.parseDouble(numbers[2])
-                ), 0);
+                ));
+            }
+
+            Pos3d[] poss = new Pos3d[2];
+            while (getTotalSize(circuitList) < 11) {
+                poss = findNextClosePos(posList, circuitList);
+                if (poss[0] == null)
+                    break ;
+
+                addCircuitList(circuitList, poss);
+            }
+
+            for (int i = 0; i < circuitList.size(); i++)
+            {
+                System.out.println("List size " + circuitList.get(i).size() + " : ");
+                circuitList.get(i).forEach( e -> e.printValues());
             }
             
-            // init 3d positions
-            // 1 - find first pos that doesnt have a circuit
-            // 2 - find next connected positions until hit one of previous
-            // 3 - increase circuit number
-            // 1 - find next connected positions until hit one of previous
-            Pos3d   current = null;
-            Pos3d   next = null;
-            Pos3d   previous = null;
-
-            int circuit = 1;
-
-            while (posList.containsValue(0))
-            {
-                // find first unassigned node and assign a circuit
-                if (next == null)
-                {
-                    next = findPosWithValueZero(posList);
-                    posList.put(next, circuit);
-                }
-                else
-                {
-                    current = next;
-                    next = findNextClosePos(posList, current, previous);
-                    next.printValues();
-                    previous = current;
-                    if (next == null || posList.get(next) > 0)
-                    {
-                        circuit++;
-                        next = null;
-                        previous = null;
-                        current = null;
-                        continue ;
-                    }
-                    posList.put(next, circuit);
-                }
-            }
-
-            posList.forEach((key, val) -> System.out.println(key + " : " + val));
-
         } catch (Exception e) {
             System.err.println("Something is wrong, check your code!");
         }
     }
 
-    public static Pos3d findPosWithValueZero(Map<Pos3d, Integer> map)
+    public static Pos3d[] findNextClosePos(List<Pos3d> list, List<List<Pos3d>> circuitList)
     {
-        Set<Pos3d> keys = map.keySet();
-        Pos3d   pos = null;
-        
-        Iterator<Pos3d> it = keys.iterator();
-        while (it.hasNext())
+        Double distance = 100000.0;
+        Pos3d[] couple = new Pos3d[2];
+        Pos3d[] result = new Pos3d[2];
+        couple[0] = null;
+        couple[1] = null;
+
+
+        for (int i = 0; i < list.size() - 1; i++)
         {
-            pos = it.next();
-            if (map.get(pos) == 0)
-                return (pos);
+            Pos3d left = list.get(i);
+            for (int j = i + 1; j < list.size(); j++)
+            {
+                Pos3d   right = list.get(j);
+                couple[0] = left;
+                couple[1] = right;
+
+                // skip if any linked list containes both of them
+                if (!containsBoth(circuitList, couple) && left != right && left.distanceTo(right) < distance)
+                {
+                    result[0] = couple[0];
+                    result[1] = couple[1];
+                
+                    distance = left.distanceTo(right);
+                }
+            }
         }
-        return null;
+        return (result);
     }
 
-    public static Pos3d findNextClosePos(Map<Pos3d, Integer> map, Pos3d current, Pos3d previous)
+    public static int getTotalSize(List<List<Pos3d>> list)
     {
-        if (current == null)
-            return null;
+        int size = 0;
 
-        Set<Pos3d> keys = map.keySet();
-        Iterator<Pos3d> it = keys.iterator();
-        Pos3d pos = null;
-        Pos3d target = null;
+        for (int i = 0; i < list.size(); i++)
+            size += list.get(i).size();
+        return (size);
+    }
 
-        while (it.hasNext())
+    public static boolean containsBoth(List<List<Pos3d>> circuitList, Pos3d[] couple)
+    {
+        if (couple[0] == null)
+            return (false);
+        for (int i = 0; i< circuitList.size(); i++)
         {
-            pos = it.next();
-            if (pos.isEqual(current) || (previous != null && pos.isEqual(previous)))
-                continue ;
-            if (target == null)
-                target = pos;
-            else if (current.distanceTo(pos) < current.distanceTo(target))
-                target = pos;
+            if (circuitList.get(i).contains(couple[0]) && circuitList.get(i).contains(couple[1]))
+                return (true);
+        }  
+        return (false);
+    }
+
+    public static boolean containsOne(List<List<Pos3d>> circuitList, Pos3d pos)
+    {
+        if (pos == null)
+            return (false);
+        for (int i = 0; i < circuitList.size(); i++)
+        {
+            if (circuitList.get(i).contains(pos))
+            {
+                return (true);
+            }
         }
-        return target;
+        return (false);
+    }
+
+    public static boolean addCircuitList(List<List<Pos3d>> circuitList, Pos3d[] couple)
+    {
+        List<Pos3d> sublist = null;
+        List<Pos3d> othersublist = null;
+        List<Pos3d> newlist = new LinkedList<>();
+
+        if (circuitList.size() == 0)
+        {
+            newlist.add(couple[0]);
+            newlist.add(couple[1]);
+            circuitList.add(newlist);
+            return (true);
+        }
+
+        for (int i = 0; i < circuitList.size(); i++)
+        {
+            sublist = circuitList.get(i);
+            if (containsBoth(circuitList, couple))
+            {
+                System.out.println("eversee");
+                return (false);
+            }
+            if (sublist.contains(couple[0]))
+            {
+                for (int u = 0; u < circuitList.size();u++)
+                {
+                    if (circuitList.get(u).contains(couple[1]))
+                        othersublist = circuitList.get(u);
+                }
+                if (othersublist != null)
+                {
+                    sublist.addAll(othersublist);
+                    circuitList.remove(othersublist);
+                }
+                else
+                    sublist.add(couple[1]);
+                return (true);
+            }
+            else if (sublist.contains(couple[1]))
+            {
+                for (int u = 0; u < circuitList.size();u++)
+                {
+                    if (circuitList.get(u).contains(couple[0]))
+                        othersublist = circuitList.get(u);
+                }
+                if (othersublist != null)
+                {
+                    sublist.addAll(othersublist);
+                    circuitList.remove(othersublist);
+                }
+                else
+                    sublist.add(couple[0]);
+                return (true);
+            }
+        }
+        newlist.add(couple[0]);
+        newlist.add(couple[1]);
+        circuitList.add(newlist);
+        return (true);
+        // System.err.println("No op");
+        // return (false);
     }
 }
