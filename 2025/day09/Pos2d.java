@@ -17,4 +17,9 @@ class Pos2d
     {
         return ((Math.abs(other.x - this.x) + 1) * (Math.abs(other.y - this.y) + 1));
     }
+
+    public String toString()
+    {
+        return "(" + this.x + ", " + this.y + ")";
+    }
 }
