@@ -29,12 +29,6 @@ public class day12
                 shapes[i] = new Shape(s);
                 i++;
             }
-            for (Shape s : shapes)
-            {
-                for (StringBuilder l : s.flipRight())
-                    System.out.println(l);
-                System.out.println();
-            }
             
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());

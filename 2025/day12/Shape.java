@@ -1,40 +1,56 @@
 package aoc.y2025.day12;
 
 class Shape {
-    String[] shape;
+    StringBuilder[] shape;
 
     public Shape(String in)
     {
         String[] raws = in.split("\n");
-        this.shape = new String[raws.length - 1];
+        this.shape = new StringBuilder[raws.length - 1];
         for (int i = 0;i < raws.length - 1; i++)
-            this.shape[i] = raws[i + 1];
+            this.shape[i] = new StringBuilder(raws[i + 1]);
     }
 
-    public String[] getShape() {
+    public StringBuilder[] getShape() {
+        return (this.shape);
+    }
+    public StringBuilder[] getShape(Direction dir) {
+        switch (dir) {
+            case UP:
+                return (this.shape);
+            case RIGHT:
+                return (rotateShape(this.shape));
+            case DOWN:
+                return (rotateShape(rotateShape(this.shape)));
+            case LEFT:
+                return (rotateShape(rotateShape(rotateShape(this.shape))));
+        }
         return (this.shape);
     }
 
-    public StringBuilder[] flipRight(){
-        StringBuilder[] flip = new StringBuilder[shape[0].length()];
-        for (int i = 0; i < flip.length; i++)
+    public static StringBuilder[] rotateShape(StringBuilder[] shape)
+    {
+        StringBuilder[] rotated = new StringBuilder[shape[0].length()];
+        for (int i = 0; i < rotated.length; i++)
         {
-            flip[i] = new StringBuilder();
-            flip[i].setLength(shape.length);
+            rotated[i] = new StringBuilder();
+            rotated[i].setLength(shape.length);
         }
-
-        for (int i = 0; i < flip.length; i++)
+        int r;
+        for (int i = 0; i < rotated.length; i++)
         {
-            int r = flip.length - 1;
-            for (int j = 0; j < flip[i].length(); j++)
+            r = shape[0].length() - 1;
+            for (int j = 0; j < rotated[i].length(); j++)
             {
-                flip[i].setCharAt(j, shape[r].charAt(i));
+                rotated[i].setCharAt(j, shape[r].charAt(i));
                 r--;
             }
         }
-        
+        return (rotated);
+    }
 
-        return (flip);
+    enum Direction {
+        UP, RIGHT, LEFT, DOWN
     }
 
 }
