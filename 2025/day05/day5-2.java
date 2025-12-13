@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.ArrayList;
 
-public class day5 {
+class day5 {
 	public static void main(String[] args) {
 
 		if (args.length == 0)
@@ -45,9 +45,10 @@ public class day5 {
 			for (int i = 1; i < lranges.size(); i++)
 			{
 				int lasti = merged.size() - 1;
-				if (lranges.get(i)[0] <= merged.get(lasti)[1]
-				&& lranges.get(i)[1] >= merged.get(lasti)[1])
+				if (lranges.get(i)[0] <= merged.get(lasti)[1])
 				{
+					if (lranges.get(i)[1] <= merged.get(lasti)[1])
+						continue;
 					long[] newrange = {merged.get(lasti)[0], lranges.get(i)[1]};
 					merged.set(lasti, newrange);
 				}
