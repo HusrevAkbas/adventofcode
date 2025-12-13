@@ -1,8 +1,8 @@
-SRC_FILES	=	day11-2.java
-RUNNER		=	aoc.y2025.day11.day11
+SRC_FILES	=	day12.java Shape.java
+RUNNER		=	aoc.y2025.day12.day12
 
 all : compile
-	@java $(RUNNER) example-2.txt
+	@java $(RUNNER) example.txt
 
 run	: compile
 	@java $(RUNNER) input.txt
