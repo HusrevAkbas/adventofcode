@@ -18,7 +18,7 @@ class Pos3d
 
     public void printValues()
     {
-        System.out.println("(" + x + "," + y + "," + z + ")");
+        System.out.print("(" + x + "," + y + "," + z + ")");
     }
 
     public  Double distanceTo(Pos3d other)
